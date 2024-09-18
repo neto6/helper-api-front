@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados Google API</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #343a40;
+            color: #fff;
+        }
+        .result-card {
+            background-color: #495057;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .result-card a {
+            color: #00d1b2;
+            text-decoration: none;
+        }
+        .result-card a:hover {
+            text-decoration: underline;
+        }
+        .result-card img {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Resultados Google API</a>
+        <a class="navbar-brand" href="index.html">Início</a>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Gugol</h1>
+        <div class="form-group">
+            <label for="query">Digite o termo de busca:</label>
+            <input type="text" id="query" class="form-control" placeholder="Buscar...">
+        </div>
+        <button id="searchBtn" class="btn btn-primary">Buscar</button>
+
+        <div class="mt-4">
+            <h3>Resultados:</h3>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#searchBtn').click(function() {
+                const query = $('#query').val();
+                if (query) {
+                    $.ajax({
+                        url: `http://localhost:5156/Google/${query}`,
+                        method: 'GET',
+                        success: function(data) {
+                            $('#results').empty();
+                            if (data.length > 0) {
+                                // Limitar os resultados aos 3 primeiros itens
+                                const limitedResults = data.slice(0, 3);
+                                limitedResults.forEach(result => {
+                                    const resultHtml = `
+                                        <div class="result-card">
+                                            <h5><a href="${result.link}" target="_blank">${result.title}</a></h5>
+                                            <p><img src="${result.favicon}" alt="Favicon"> <a href="${result.redirect_link}" target="_blank">${result.displayed_link}</a></p>
+                                            <p>${result.snippet}</p>
+                                        </div>
+                                    `;
+                                    $('#results').append(resultHtml);
+                                });
+                            } else {
+                                $('#results').text('Nenhum resultado encontrado.');
+                            }
+                        },
+                        error: function() {
+                            $('#results').text('Erro ao obter informações.');
+                        }
+                    });
+                } else {
+                    $('#results').text('Por favor, digite um termo de busca.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

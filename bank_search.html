@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bancos API</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #343a40;
+            color: #fff;
+        }
+        .result-card {
+            background-color: #495057;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Bancos API</a>
+        <a class="navbar-brand" href="index.html">Início</a>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="text-center">Buscar Bancos por Nome</h1>
+        <div class="form-group">
+            <label for="bankQuery">Digite o nome do banco:</label>
+            <input type="text" id="bankQuery" class="form-control" placeholder="Banco...">
+        </div>
+        <button id="searchBankBtn" class="btn btn-primary">Buscar</button>
+
+        <div class="mt-4">
+            <h3>Resultados:</h3>
+            <div id="bankResults"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#searchBankBtn').click(function() {
+                const bankQuery = $('#bankQuery').val();
+                if (bankQuery) {
+                    $.ajax({
+                        url: `http://localhost:5156/Bank/${bankQuery}`,
+                        method: 'GET',
+                        success: function(data) {
+                            $('#bankResults').empty();
+                            if (data.length > 0) {
+                                data.forEach(bank => {
+                                    const bankHtml = `
+                                        <div class="result-card">
+                                            <h5>${bank.name} (Cód: ${bank.code})</h5>
+                                            <p><strong>ISPB:</strong> ${bank.ispb}</p>
+                                            <p><strong>Nome Completo:</strong> ${bank.fullName}</p>
+                                        </div>
+                                    `;
+                                    $('#bankResults').append(bankHtml);
+                                });
+                            } else {
+                                $('#bankResults').text('Nenhum resultado encontrado.');
+                            }
+                        },
+                        error: function() {
+                            $('#bankResults').text('Erro ao obter informações.');
+                        }
+                    });
+                } else {
+                    $('#bankResults').text('Por favor, digite o nome de um banco.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
